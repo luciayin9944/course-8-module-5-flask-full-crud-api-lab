@@ -17,6 +17,19 @@ events = [
     Event(2, "Python Workshop")
 ]
 
+@app.route("/events", methods=["GET"])
+def get_events_list():
+    return jsonify([e.to_dict() for e in events])
+
+
+@app.route("/events/<int:event_id>", methods=["GET"]) 
+def get_event(event_id):
+    event = next((e for e in events if e.id==event_id), None)
+    if not event:
+        return ("Event not found", 404)
+    return jsonify(event.to_dict())
+
+
 # Create a new event from JSON input
 @app.route("/events", methods=["POST"])
 def create_event():
@@ -33,7 +46,7 @@ def update_event(event_id):
     data = request.get_json()
     event = next((e for e in events if e.id==event_id), None)
     if not event:
-        return("Event not found", 404)
+        return ("Event not found", 404)
     event.title = data["title"]
     return jsonify(event.to_dict())
 
@@ -46,7 +59,8 @@ def delete_event(event_id):
     if not event:
         return("Event not found", 404)
     events = [e for e in events if e.id!=event_id]
-    return jsonify([e.to_dict() for e in events]), 204
+    #return jsonify([e.to_dict() for e in events]), 200
+    return ("Event deleted", 204)
     
 
 if __name__ == "__main__":
